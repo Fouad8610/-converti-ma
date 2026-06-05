@@ -4,7 +4,16 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { fileData, fileName } = req.body;
+    const { fileData, fileName, type } = req.body;
+    
+    let inputFormat, outputFormat;
+    if (type === 'pdf-docx') {
+      inputFormat = 'pdf';
+      outputFormat = 'docx';
+    } else {
+      inputFormat = 'docx';
+      outputFormat = 'pdf';
+    }
     
     const jobRes = await fetch('https://api.cloudconvert.com/v2/jobs', {
       method: 'POST',
@@ -15,7 +24,7 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         "tasks": {
           "import-1": { "operation": "import/base64", "file": fileData, "filename": fileName },
-          "convert-1": { "operation": "convert", "input": "import-1", "input_format": "docx", "output_format": "pdf" },
+          "convert-1": { "operation": "convert", "input": "import-1", "input_format": inputFormat, "output_format": outputFormat },
           "export-1": { "operation": "export/url", "input": "convert-1" }
         }
       })
