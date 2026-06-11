@@ -1,0 +1,15 @@
+function speakText() {
+const text = document.getElementById("text").value;
+const language = document.getElementById("language").value;
+const speed = document.getElementById("speed").value;
+
+const speech = new SpeechSynthesisUtterance(text);
+speech.lang = language;
+speech.rate = speed;
+
+window.speechSynthesis.speak(speech);
+}
+
+function stopSpeech() {
+window.speechSynthesis.cancel();
+}

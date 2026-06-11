@@ -1,153 +1,34 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Converti MA Pro - كل أدوات PDF</title>
-    <style>
-        body { font-family: Arial; text-align: center; padding: 15px; background: #f0f2f5; }
-      .container { background: white; padding: 20px; border-radius: 12px; max-width: 700px; margin: 20px auto; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        h1 { color: #1a1a1a; margin-bottom: 5px; }
-      .subtitle { color: #666; margin-bottom: 25px; }
-      .tools-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 25px; }
-      .tool-btn { padding: 15px 10px; background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 8px; cursor: pointer; transition: 0.2s; }
-      .tool-btn.active { background: #0066ff; color: white; border-color: #0066ff; }
-      .tool-btn:hover { border-color: #0066ff; }
-      .drop-zone { border: 2px dashed #0066ff; border-radius: 8px; padding: 40px 20px; margin: 20px 0; cursor: pointer; background: #f8faff; }
-      .drop-zone.dragover { background: #e6f0ff; border-color: #0044cc; }
-        button#convertBtn { background: #0066ff; color: white; padding: 15px 30px; border: none; border-radius: 8px; cursor: pointer; font-size: 18px; width: 100%; }
-        button:disabled { background: #ccc; cursor: not-allowed; }
-        #status { margin-top: 20px; font-weight: bold; min-height: 24px; }
-        a { color: #0066ff; font-weight: bold; }
-      .hidden { display: none; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MultiVoice TTS - Text to Speech Converter</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Converti MA Pro</h1>
-        <p class="subtitle">كل أدوات PDF و Word فبلاصة واحدة - مجاناً</p>
-        
-        <div class="tools-grid">
-            <div class="tool-btn active" data-type="docx-pdf">Word → PDF</div>
-            <div class="tool-btn" data-type="pdf-docx">PDF → Word</div>
-            <div class="tool-btn" data-type="compress">ضغط PDF</div>
-            <div class="tool-btn" data-type="merge">دمج PDF</div>
-            <div class="tool-btn" data-type="split">تقسيم PDF</div>
-            <div class="tool-btn" data-type="pdf-jpg">PDF → JPG</div>
-            <div class="tool-btn" data-type="jpg-pdf">JPG → PDF</div>
-            <div class="tool-btn" data-type="delete">حذف صفحات</div>
-        </div>
-        
-        <div class="drop-zone" id="dropZone">
-            <p id="dropText">سحب وأفلت الملفات هنا أو اضغط للاختيار</p>
-            <input type="file" id="fileInput" multiple hidden />
-        </div>
-        
-        <div id="pageInput" class="hidden">
-            <input type="text" id="pages" placeholder="مثال: 1,3,5-7" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #ccc;">
-        </div>
-        
-        <button onclick="convertFile()" id="convertBtn">نفّذ العملية</button>
-        <div id="status"></div>
-    </div>
 
-    <script>
-        let currentTool = 'docx-pdf';
-        const dropZone = document.getElementById('dropZone');
-        const fileInput = document.getElementById('fileInput');
-        const dropText = document.getElementById('dropText');
-        const status = document.getElementById('status');
-        const btn = document.getElementById('convertBtn');
-        const pageInput = document.getElementById('pageInput');
+<header>
+<h1>🎤 MultiVoice TTS</h1>
+<p>Convert Text to Speech in Multiple Languages</p>
+</header>
 
-        document.querySelectorAll('.tool-btn').forEach(tool => {
-            tool.onclick = () => {
-                document.querySelectorAll('.tool-btn').forEach(t => t.classList.remove('active'));
-                tool.classList.add('active');
-                currentTool = tool.dataset.type;
-                fileInput.value = '';
-                updateUI();
-            };
-        });
+<main>
+<textarea id="text" placeholder="Type your text here..."></textarea>
 
-        function updateUI() {
-            const isMultiple = ['merge', 'jpg-pdf'].includes(currentTool);
-            const needsPages = ['split', 'delete'].includes(currentTool);
-            fileInput.multiple = isMultiple;
-            pageInput.classList.toggle('hidden',!needsPages);
-            
-            const texts = {
-                'docx-pdf': 'سحب وأفلت ملفات Word هنا',
-                'pdf-docx': 'سحب وأفلت ملف PDF هنا',
-                'compress': 'سحب وأفلت ملف PDF لضغطه',
-                'merge': 'سحب وأفلت 2+ ملفات PDF لدمجها',
-                'split': 'سحب وأفلت ملف PDF لتقسيمه',
-                'pdf-jpg': 'سحب وأفلت ملف PDF لتحويله لصور',
-                'jpg-pdf': 'سحب وأفلت الصور JPG/PNG',
-                'delete': 'سحب وأفلت ملف PDF لحذف صفحات'
-            };
-            dropText.innerText = texts[currentTool];
-            status.innerText = '';
-        }
+<select id="language">
+<option value="ar-SA">العربية</option>
+<option value="en-US">English</option>
+<option value="fr-FR">Français</option>
+</select>
 
-        dropZone.onclick = () => fileInput.click();
-        dropZone.ondragover = (e) => { e.preventDefault(); dropZone.classList.add('dragover'); };
-        dropZone.ondragleave = () => dropZone.classList.remove('dragover');
-        dropZone.ondrop = (e) => {
-            e.preventDefault(); 
-            dropZone.classList.remove('dragover');
-            fileInput.files = e.dataTransfer.files;
-            updateFileText();
-        };
-        fileInput.onchange = updateFileText;
-        
-        function updateFileText() {
-            const count = fileInput.files.length;
-            if (count === 1) dropText.innerText = `تم اختيار: ${fileInput.files[0].name}`;
-            else if (count > 1) dropText.innerText = `تم اختيار ${count} ملفات`;
-        }
+<input type="range" id="speed" min="0.5" max="2" step="0.1" value="1">
 
-        async function convertFile() {
-            if (!fileInput.files.length) {
-                status.innerText = 'ختار ملف الأول';
-                return;
-            }
-            
-            btn.disabled = true;
-            status.innerText = 'جاري التنفيذ... تسنّا شوية ⏳';
-            
-            const files = Array.from(fileInput.files);
-            const filesData = await Promise.all(files.map(file => {
-                return new Promise(resolve => {
-                    const reader = new FileReader();
-                    reader.onload = e => resolve({ data: e.target.result.split(',')[1], name: file.name });
-                    reader.readAsDataURL(file);
-                });
-            }));
-            
-            try {
-                const res = await fetch('/api/convert', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        files: filesData, 
-                        type: currentTool,
-                        pages: document.getElementById('pages').value 
-                    })
-                });
-                
-                const data = await res.json();
-                if (data.url) {
-                    status.innerHTML = `✅ تم بنجاح! <br><a href="${data.url}" target="_blank" download>ضغط هنا للتحميل</a>`;
-                } else {
-                    status.innerText = '❌ وقع خطأ: ' + (data.error || '');
-                }
-            } catch (error) {
-                status.innerText = '❌ خطأ في الاتصال بالسيرفر';
-            }
-            btn.disabled = false;
-        }
-        updateUI();
-    </script>
+<button onclick="speakText()">Convert to Speech</button>
+<button onclick="stopSpeech()">Stop</button>
+</main>
+
+<script src="script.js"></script>
+
 </body>
 </html>
